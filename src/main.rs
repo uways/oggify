@@ -1,28 +1,28 @@
-extern crate tokio_core;
-extern crate regex;
+extern crate env_logger;
+extern crate librespot_audio;
 extern crate librespot_core;
 extern crate librespot_metadata;
-extern crate librespot_audio;
 #[macro_use]
 extern crate log;
-extern crate env_logger;
+extern crate regex;
 extern crate scoped_threadpool;
+extern crate tokio_core;
 
-use std::time::Duration;
 use std::env;
+use std::io::{self, BufRead, Read, Result};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::io::{self, Read, BufRead, Result};
-use tokio_core::reactor::Core;
-use regex::Regex;
-use env_logger::{Builder, Env};
-use scoped_threadpool::Pool;
+use std::time::Duration;
 
+use env_logger::{Builder, Env};
+use librespot_audio::{AudioDecrypt, AudioFile};
 use librespot_core::authentication::Credentials;
 use librespot_core::config::SessionConfig;
 use librespot_core::session::Session;
 use librespot_core::spotify_id::SpotifyId;
-use librespot_metadata::{Metadata, FileFormat, Track, Artist};
-use librespot_audio::{AudioDecrypt, AudioFile};
+use librespot_metadata::{Artist, FileFormat, Metadata, Track};
+use regex::Regex;
+use scoped_threadpool::Pool;
+use tokio_core::reactor::Core;
 
 fn main() {
     Builder::from_env(Env::default().default_filter_or("info")).init();
