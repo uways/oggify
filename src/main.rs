@@ -60,7 +60,7 @@ fn main() {
             debug!("File formats: {}", track.files.keys().map(|filetype|format!("{:?}", filetype)).collect::<Vec<_>>().join(" "));
             let file_id = track.files.get(&FileFormat::OGG_VORBIS_320)
                 .or(track.files.get(&FileFormat::OGG_VORBIS_160))
-                .or(track.files.get(&FileFormat::OGG_VORBIS_320))
+                .or(track.files.get(&FileFormat::OGG_VORBIS_96))
                 .expect("Could not find a OGG_VORBIS format for the track.");
             let key = core.run(session.audio_key().request(track.id, *file_id)).expect("Cannot get audio key");
             let mut encrypted_file = core.run(AudioFile::open(&session, *file_id)).unwrap();
