@@ -10,6 +10,8 @@ extern crate tokio_core;
 
 use std::env;
 use std::io::{self, BufRead, Read, Result};
+use std::io::Write;
+use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
@@ -28,7 +30,7 @@ fn main() {
     Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let args: Vec<_> = env::args().collect();
-    assert!(args.len() == 3, "Usage: {} USERNAME PASSWORD < tracks_file", args[0]);
+    assert!(args.len() == 3 || args.len() == 4, "Usage: {} user password [helper_script] < tracks_file", args[0]);
 
     let mut core = Core::new().unwrap();
     let handle = core.handle();
@@ -67,8 +69,6 @@ fn main() {
                 warn!("Found track alternative {} -> {}", id.to_base62(), track.id.to_base62());
             }
             let artists_strs: Vec<_> = track.artists.iter().map(|id|core.run(Artist::get(&session, *id)).expect("Cannot get artist metadata").name).collect();
-            let artists_display = artists_strs.join(", ");
-            let fname = format!("{} - {}.ogg", artists_display, track.name);
             debug!("File formats: {}", track.files.keys().map(|filetype|format!("{:?}", filetype)).collect::<Vec<_>>().join(" "));
             let file_id = track.files.get(&FileFormat::OGG_VORBIS_320)
                 .or(track.files.get(&FileFormat::OGG_VORBIS_160))
@@ -91,7 +91,18 @@ fn main() {
             read_all.expect("Cannot read file stream");
             let mut decrypted_buffer = Vec::new();
             AudioDecrypt::new(key, &buffer[..]).read_to_end(&mut decrypted_buffer).expect("Cannot decrypt stream");
-            std::fs::write(&fname, &decrypted_buffer[0xa7..]).expect("Cannot write decrypted track");
-            info!("Filename: {}", fname);
+            if args.len() == 3 {
+                let fname = format!("{} - {}.ogg", artists_strs.join(", "), track.name);
+                std::fs::write(&fname, &decrypted_buffer[0xa7..]).expect("Cannot write decrypted track");
+                info!("Filename: {}", fname);
+            } else {
+                let mut cmd = Command::new(args[3].to_owned());
+                cmd.stdin(Stdio::piped());
+                cmd.arg(track.name).args(artists_strs.iter());
+                let mut child = cmd.spawn().expect("Could not run helper program");
+                let pipe = child.stdin.as_mut().expect("Could not open helper stdin");
+                pipe.write_all(&decrypted_buffer[0xa7..]).expect("Failed to write to stdin");
+                assert!(child.wait().expect("Out of ideas for error messages").success(), "Helper script returned an error");
+            }
         });
 }
