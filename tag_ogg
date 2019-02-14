@@ -2,12 +2,17 @@
 
 set -e
 
-fname=$(echo "${2} - ${1}.ogg" | tr '/' - | tr '\0' ' ')
+fname=$(echo "${4} - ${2}.ogg" | tr '/' - | tr '\0' ' ')
 cat > "$fname"
 {
-	echo "TITLE=${1}" | tr '\n' ' '
-	shift
+	echo "SPOTIFY_ID=${1}"
+	title=$(tr '\n' ' ' <<< "${2}")
+	album=$(tr '\n' ' ' <<< "${3}")
+	echo "TITLE=${title}"
+	echo "ALBUM=${album}"
+	shift 3
 	for artist in "$@"; do
-		echo "ARTIST=${artist}" | tr '\n' ' '
+		artist=$(tr '\n' ' ' <<< "${artist}")
+		echo "ARTIST=${artist}"
 	done
 } | vorbiscomment -a "$fname"

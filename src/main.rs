@@ -21,7 +21,7 @@ use librespot_core::authentication::Credentials;
 use librespot_core::config::SessionConfig;
 use librespot_core::session::Session;
 use librespot_core::spotify_id::SpotifyId;
-use librespot_metadata::{Artist, FileFormat, Metadata, Track};
+use librespot_metadata::{Artist, FileFormat, Metadata, Track, Album};
 use regex::Regex;
 use scoped_threadpool::Pool;
 use tokio_core::reactor::Core;
@@ -96,9 +96,10 @@ fn main() {
                 std::fs::write(&fname, &decrypted_buffer[0xa7..]).expect("Cannot write decrypted track");
                 info!("Filename: {}", fname);
             } else {
+                let album = core.run(Album::get(&session, track.album)).expect("Cannot get album metadata");
                 let mut cmd = Command::new(args[3].to_owned());
                 cmd.stdin(Stdio::piped());
-                cmd.arg(track.name).args(artists_strs.iter());
+                cmd.arg(id.to_base62()).arg(track.name).arg(album.name).args(artists_strs.iter());
                 let mut child = cmd.spawn().expect("Could not run helper program");
                 let pipe = child.stdin.as_mut().expect("Could not open helper stdin");
                 pipe.write_all(&decrypted_buffer[0xa7..]).expect("Failed to write to stdin");
