@@ -53,7 +53,19 @@ fn main() {
                     .and_then(|capture|SpotifyId::from_base62(&capture[1]).ok())))
         .for_each(|id|{
             info!("Getting track {}...", id.to_base62());
-            let track = core.run(Track::get(&session, id)).expect("Cannot get track metadata");
+            let mut track = core.run(Track::get(&session, id)).expect("Cannot get track metadata");
+            if !track.available {
+                warn!("Track {} is not available, finding alternative...", id.to_base62());
+                let alt_track = track.alternatives.iter().find_map(|id|{
+                    let alt_track = core.run(Track::get(&session, *id)).expect("Cannot get track metadata");
+                    match alt_track.available {
+                        true => Some(alt_track),
+                        false => None
+                    }
+                });
+                track = alt_track.expect(&format!("Could not find alternative for track {}", id.to_base62()));
+                warn!("Found track alternative {} -> {}", id.to_base62(), track.id.to_base62());
+            }
             let artists_strs: Vec<_> = track.artists.iter().map(|id|core.run(Artist::get(&session, *id)).expect("Cannot get artist metadata").name).collect();
             let artists_display = artists_strs.join(", ");
             let fname = format!("{} - {}.ogg", artists_display, track.name);
