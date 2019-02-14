@@ -3,6 +3,11 @@ name = "oggify"
 version = "0.1.0"
 authors = ["Lorenzo Pistone <blaffablaffa@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "Download Spotify tracks to Ogg Vorbis format with a Premium account"
+keywords = ["spotify"]
+repository = "https://github.com/pisto/oggify"
+readme = "README.md"
 
 [dependencies]
 tokio-core = "0.1.17"
