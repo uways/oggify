@@ -2,7 +2,7 @@
 
 set -e
 
-fname=$(echo "${4} - ${2}.ogg" | tr '/' - | tr '\0' ' ')
+fname=$(echo "${4} - ${2}.ogg" | tr '/' -)
 cat > "$fname"
 {
 	echo "SPOTIFY_ID=${1}"
