@@ -4,6 +4,7 @@ set -e
 
 fname=$(echo "${4} - ${2}.ogg" | tr '/' - | tr '\0' ' ')
 cat > "$fname"
+echo "$fname"
 {
 	echo "SPOTIFY_ID=${1}"
 	title=$(tr '\n' ' ' <<< "${2}")
