@@ -7,14 +7,11 @@ fname="${fname//\//-}"
 cat > "${fname}"
 {
 	echo "SPOTIFY_ID=${1}"
-	title="${2//'\n'/' '}"
-	album="${3//'\n'/' '}"
-	echo "TITLE=${title}"
-	echo "ALBUM=${album}"
+	echo "TITLE=${2//'\n'/' '}"
+	echo "ALBUM=${3//'\n'/' '}"
 	shift 3
 	for artist in "$@"; do
-		artist="${artist//'\n'/' '}"
-		echo "ARTIST=${artist}"
+		echo "ARTIST=${artist//'\n'/' '}"
 	done
 } | vorbiscomment -a "${fname}"
 echo "${fname}"
