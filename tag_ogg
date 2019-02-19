@@ -5,7 +5,6 @@ set -e
 fname="${4} - ${2}.ogg"
 fname="${fname//\//-}"
 cat > "${fname}"
-echo "${fname}"
 {
 	echo "SPOTIFY_ID=${1}"
 	title="${2//'\n'/' '}"
@@ -18,3 +17,4 @@ echo "${fname}"
 		echo "ARTIST=${artist}"
 	done
 } | vorbiscomment -a "${fname}"
+echo "${fname}"
