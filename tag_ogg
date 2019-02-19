@@ -1,19 +1,20 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
-fname=$(echo "${4} - ${2}.ogg" | tr '/' -)
-cat > "$fname"
-echo "$fname"
+fname="${4} - ${2}.ogg"
+fname="${fname//\//-}"
+cat > "${fname}"
+echo "${fname}"
 {
 	echo "SPOTIFY_ID=${1}"
-	title=$(tr '\n' ' ' <<< "${2}")
-	album=$(tr '\n' ' ' <<< "${3}")
+	title="${2//'\n'/' '}"
+	album="${3//'\n'/' '}"
 	echo "TITLE=${title}"
 	echo "ALBUM=${album}"
 	shift 3
 	for artist in "$@"; do
-		artist=$(tr '\n' ' ' <<< "${artist}")
+		artist="${artist//'\n'/' '}"
 		echo "ARTIST=${artist}"
 	done
-} | vorbiscomment -a "$fname"
+} | vorbiscomment -a "${fname}"
