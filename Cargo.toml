@@ -10,10 +10,10 @@ repository = "https://github.com/pisto/oggify"
 readme = "README.md"
 
 [dependencies]
-tokio-core = "0.1.17"
-librespot-core = { git = "https://github.com/librespot-org/librespot.git" }
-librespot-metadata = { git = "https://github.com/librespot-org/librespot.git" }
-librespot-audio = { git = "https://github.com/librespot-org/librespot.git" }
+tokio = { version = "1.13.0", features = ["rt-multi-thread", "time"] }
+librespot-core = { git = "https://github.com/librespot-org/librespot.git", tag = "v0.3.1" }
+librespot-metadata = { git = "https://github.com/librespot-org/librespot.git", tag = "v0.3.1" }
+librespot-audio = { git = "https://github.com/librespot-org/librespot.git", tag = "v0.3.1" }
 regex = "1.1.0"
 log = "0.4.6"
 env_logger = "0.6.0"
